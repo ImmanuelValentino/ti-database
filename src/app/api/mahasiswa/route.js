@@ -1,23 +1,27 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
-// GET: ambil semua mahasiswa
+// Ambil semua mahasiswa
 export async function GET() {
     const { data, error } = await supabase.from("mahasiswa").select("*");
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
     return NextResponse.json(data);
 }
 
-// POST: tambah mahasiswa
+// Tambah mahasiswa baru
 export async function POST(req) {
     const body = await req.json();
-    const { nim, nama, jurusan } = body;
 
     const { data, error } = await supabase
         .from("mahasiswa")
-        .insert([{ nim, nama, jurusan }])
+        .insert([body]) // body harus ada nim, nama, jurusan
         .select();
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json(data[0]);
+    if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    return NextResponse.json(data[0], { status: 201 });
 }
