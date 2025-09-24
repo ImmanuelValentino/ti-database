@@ -1,0 +1,77 @@
+openapi: 3.0.0
+info:
+  title: TI Database API
+  description: API untuk manajemen data mahasiswa Teknik Informatika
+  version: 1.0.0
+servers:
+  - url: https://ti-database.vercel.app
+paths:
+  /api/mahasiswa:
+    get:
+      summary: Ambil semua mahasiswa
+      responses:
+        "200":
+          description: Daftar mahasiswa
+    post:
+      summary: Tambah mahasiswa baru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nim:
+                  type: string
+                nama:
+                  type: string
+                jurusan:
+                  type: string
+      responses:
+        "201":
+          description: Mahasiswa berhasil ditambahkan
+  /api/mahasiswa/{nim}:
+    get:
+      summary: Ambil mahasiswa berdasarkan NIM
+      parameters:
+        - in: path
+          name: nim
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Detail mahasiswa
+    put:
+      summary: Update data mahasiswa
+      parameters:
+        - in: path
+          name: nim
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nama:
+                  type: string
+                jurusan:
+                  type: string
+      responses:
+        "200":
+          description: Data mahasiswa berhasil diperbarui
+    delete:
+      summary: Hapus mahasiswa
+      parameters:
+        - in: path
+          name: nim
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Mahasiswa berhasil dihapus
