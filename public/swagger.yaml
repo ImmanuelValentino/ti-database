@@ -75,3 +75,77 @@ paths:
       responses:
         "200":
           description: Mahasiswa berhasil dihapus
+  /api/mata_kuliah:
+    get:
+      summary: Ambil semua mata kuliah
+      responses:
+        "200":
+          description: Daftar semua mata kuliah
+    post:
+      summary: Tambah mata kuliah baru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                kode_mk:
+                  type: string
+                nama_mk:
+                  type: string
+                sks:
+                  type: integer
+      responses:
+        "201":
+          description: Mata kuliah berhasil ditambahkan
+  /api/nilai:
+    get:
+      summary: Ambil semua data nilai
+      description: Mengembalikan semua data nilai, termasuk detail mahasiswa dan mata kuliah yang berelasi.
+      responses:
+        "200":
+          description: Daftar semua nilai dengan data join.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    nilai:
+                      type: integer
+                    mahasiswa:
+                      type: object
+                      properties:
+                        nim:
+                          type: string
+                        nama:
+                          type: string
+                    mata_kuliah:
+                      type: object
+                      properties:
+                        kode_mk:
+                          type: string
+                        nama_mk:
+                          type: string
+    post:
+      summary: Tambah data nilai baru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nim:
+                  type: string
+                kode_mk:
+                  type: string
+                nilai:
+                  type: integer
+      responses:
+        "201":
+          description: Data nilai berhasil ditambahkan
