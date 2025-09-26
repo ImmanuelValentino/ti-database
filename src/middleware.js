@@ -1,23 +1,32 @@
 import { NextResponse } from 'next/server';
 
+// Definisikan headers CORS di sini
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key',
+};
+
 export function middleware(request) {
-    // Kita hanya ingin middleware ini berjalan untuk path API
+    // 1. Langsung tangani preflight request (OPTIONS)
+    if (request.method === 'OPTIONS') {
+        return new NextResponse(null, { status: 204, headers: corsHeaders });
+    }
+
+    // 2. Jalankan pengecekan API Key untuk path API
     if (request.nextUrl.pathname.startsWith('/api/')) {
         const apiKey = request.headers.get('x-api-key');
-
-        // Ambil daftar kunci yang valid dari Vercel Environment Variables
         const validApiKeys = process.env.VALID_API_KEYS?.split(',');
 
-        // Jika tidak ada daftar kunci atau kunci yang diberikan tidak valid
         if (!validApiKeys || !validApiKeys.includes(apiKey)) {
-            // Tolak permintaan
+            // 3. Kembalikan error DENGAN CORS headers
             return new NextResponse(
                 JSON.stringify({ message: 'Unauthorized' }),
-                { status: 401, headers: { 'Content-Type': 'application/json' } }
+                { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             );
         }
     }
 
-    // Jika kunci valid, lanjutkan permintaan
+    // Jika semua pengecekan lolos, lanjutkan
     return NextResponse.next();
 }
