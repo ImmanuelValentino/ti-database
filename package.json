@@ -14,7 +14,8 @@
     "react-dom": "19.1.0",
     "swagger-ui-express": "^5.0.1",
     "swagger-ui-react": "^5.29.0",
-    "yamljs": "^0.3.0"
+    "yamljs": "^0.3.0",
+    "zod": "^4.1.11"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
