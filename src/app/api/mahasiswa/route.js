@@ -2,51 +2,58 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { z } from "zod";
 
-// Skema untuk UPDATE, semua field bersifat opsional
-const UpdateMahasiswaSchema = z.object({
-    nama: z.string().min(1, { message: "Nama tidak boleh kosong" }).optional(),
-    jurusan: z.string().min(1, { message: "Jurusan tidak boleh kosong" }).optional(),
-})
-    .refine(data => Object.keys(data).length > 0, {
-        message: "Request body tidak boleh kosong. Kirim setidaknya satu field (nama/jurusan) untuk diupdate.",
-    });
+// Definisikan headers CORS di satu tempat agar mudah digunakan
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
 
+const MahasiswaSchema = z.object({
+    nim: z.string().regex(/^[0-9]+$/, "NIM harus berupa string angka"),
+    nama: z.string().min(1, { message: "Nama tidak boleh kosong" }),
+    jurusan: z.string().min(1, { message: "Jurusan tidak boleh kosong" }),
+});
 
-// GET (tidak berubah)
-export async function GET(req, { params }) {
-    // ... kode GET Anda yang sudah ada ...
+// GET semua mahasiswa
+export async function GET() {
+    const { data, error } = await supabase.from("mahasiswa").select("*");
+
+    if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders });
+    }
+    // Pastikan headers ada di respons sukses
+    return NextResponse.json(data, { headers: corsHeaders });
 }
 
-// Update mahasiswa by NIM DENGAN VALIDASI
-export async function PUT(req, { params }) {
+// Tambah mahasiswa baru DENGAN VALIDASI & CORS
+export async function POST(req) {
     try {
-        const { nim } = params;
         const body = await req.json();
-
-        // Validasi body request
-        const validatedData = UpdateMahasiswaSchema.parse(body);
+        const validatedData = MahasiswaSchema.parse(body);
 
         const { data, error } = await supabase
             .from("mahasiswa")
-            .update(validatedData) // Gunakan data yang sudah divalidasi
-            .eq("nim", nim)
+            .insert([validatedData])
             .select()
             .single();
 
         if (error) {
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            if (error.code === '23505') {
+                return NextResponse.json({ error: "NIM sudah terdaftar." }, { status: 409, headers: corsHeaders });
+            }
+            return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders });
         }
-        return NextResponse.json(data);
+
+        // Pastikan headers ada di respons sukses
+        return NextResponse.json(data, { status: 201, headers: corsHeaders });
 
     } catch (error) {
         if (error instanceof z.ZodError) {
-            return NextResponse.json({ error: error.issues }, { status: 400 });
+            // Pastikan headers ada di respons error validasi
+            return NextResponse.json({ error: error.issues }, { status: 400, headers: corsHeaders });
         }
-        return NextResponse.json({ error: "Request body tidak valid" }, { status: 400 });
+        // Pastikan headers ada di respons error lainnya
+        return NextResponse.json({ error: "Request body tidak valid" }, { status: 400, headers: corsHeaders });
     }
-}
-
-// DELETE (tidak berubah)
-export async function DELETE(req, { params }) {
-    // ... kode DELETE Anda yang sudah ada ...
 }
