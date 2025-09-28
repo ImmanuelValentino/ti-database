@@ -21,13 +21,33 @@ const MahasiswaSchema = z.object({
     jurusan: z.string().min(1, { message: "Jurusan tidak boleh kosong" }),
 });
 
-// GET semua mahasiswa
-export async function GET() {
-    const { data, error } = await supabase.from("mahasiswa").select("*");
+// GET semua mahasiswa DENGAN PAGINATION
+export async function GET(request) {
+    const searchParams = request.nextUrl.searchParams;
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+
+    // Kalkulasi untuk range Supabase
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    // Ambil data dan total hitungan
+    const { data, error, count } = await supabase
+        .from("mahasiswa")
+        .select("*", { count: 'exact' }) // Minta total data
+        .range(from, to); // Ambil hanya data untuk halaman ini
+
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders });
     }
-    return NextResponse.json(data, { headers: corsHeaders });
+
+    // Kembalikan data beserta informasi pagination
+    return NextResponse.json({
+        data,
+        count,
+        page,
+        limit
+    }, { headers: corsHeaders });
 }
 
 // POST tambah mahasiswa baru
