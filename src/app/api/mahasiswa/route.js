@@ -21,27 +21,35 @@ const MahasiswaSchema = z.object({
     jurusan: z.string().min(1, { message: "Jurusan tidak boleh kosong" }),
 });
 
-// GET semua mahasiswa DENGAN PAGINATION
+// GET semua mahasiswa DENGAN PAGINATION & SEARCH
 export async function GET(request) {
     const searchParams = request.nextUrl.searchParams;
+
+    // Ambil parameter untuk pagination & search
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
+    const search = searchParams.get('search');
 
-    // Kalkulasi untuk range Supabase
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
-    // Ambil data dan total hitungan
-    const { data, error, count } = await supabase
+    // 1. Mulai membangun query
+    let query = supabase
         .from("mahasiswa")
-        .select("*", { count: 'exact' }) // Minta total data
-        .range(from, to); // Ambil hanya data untuk halaman ini
+        .select("*", { count: 'exact' });
+
+    // 2. Jika ada parameter search, tambahkan filter .ilike()
+    if (search) {
+        query = query.ilike('nama', `%${search}%`); // cari nama yang mengandung string 'search'
+    }
+
+    // 3. Tambahkan pagination dan eksekusi query
+    const { data, error, count } = await query.range(from, to);
 
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders });
     }
 
-    // Kembalikan data beserta informasi pagination
     return NextResponse.json({
         data,
         count,
