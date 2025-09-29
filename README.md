@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# TI Database API
 
-## Getting Started
+Sebuah API publik sederhana yang dibuat dengan Next.js dan Supabase untuk mengelola data akademik mahasiswa, mata kuliah, dan nilai. Proyek ini dilengkapi dengan validasi input, pagination, dan sistem API Key.
 
-First, run the development server:
+## Dokumentasi & Live Demo
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Dokumentasi API interaktif tersedia dan dibuat menggunakan Swagger UI. Anda bisa melihat dan mencoba semua *endpoint* secara langsung di sini:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**[Lihat Dokumentasi API Langsung](https://ti-database.vercel.app/docs)**
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Fitur Utama
+- **CRUD Penuh**: Operasi Create, Read, Update, Delete untuk *resource* `mahasiswa`.
+- **Relasional**: Mengelola hubungan antara `mahasiswa`, `mata_kuliah`, dan `nilai`.
+- **Pagination**: Endpoint `GET /api/mahasiswa` mendukung pagination dengan parameter `page` dan `limit`.
+- **Pencarian Cerdas**: Endpoint `GET /api/mahasiswa` mendukung pencarian berdasarkan nama (teks) atau NIM (angka).
+- **Validasi Input**: Setiap data yang masuk melalui `POST` atau `PUT` divalidasi menggunakan Zod.
+- **Keamanan**: Dilengkapi dengan sistem API Key dan kebijakan Row Level Security (RLS) dasar di Supabase.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Teknologi yang Digunakan
+- **Framework**: [Next.js](https://nextjs.org/) (App Router)
+- **Database**: [Supabase](https://supabase.io/) (PostgreSQL)
+- **Validasi**: [Zod](https://zod.dev/)
+- **Deployment**: [Vercel](https://vercel.com/)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Menjalankan Proyek Secara Lokal
 
-## Deploy on Vercel
+1.  **Clone repositori ini:**
+    ```bash
+    git clone [https://github.com/ImmanuelValentino/ti-database.git](https://github.com/ImmanuelValentino/ti-database.git)
+    cd ti-database
+    ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2.  **Install dependensi:**
+    ```bash
+    npm install
+    ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3.  **Buat file `.env.local`**:
+    Buat file `.env.local` di root folder dan isi dengan variabel dari proyek Supabase Anda.
+    ```env
+    NEXT_PUBLIC_SUPABASE_URL=URL_PROYEK_SUPABASE_ANDA
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=ANON_KEY_PROYEK_ANDA
+    VALID_API_KEYS=KUNCI_API_KUSTOM_ANDA_1,KUNCI_API_KUSTOM_ANDA_2
+    ```
+
+4.  **Jalankan server pengembangan:**
+    ```bash
+    npm run dev
+    ```
+    Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
