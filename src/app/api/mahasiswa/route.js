@@ -15,10 +15,14 @@ export async function OPTIONS(request) {
 }
 
 // Skema Zod untuk POST (membuat data baru)
+const validJurusan = ["Teknik Informatika", "Sistem Informasi", "Ilmu Administrasi Bisnis", "Ilmu Komunikasi", "Akuntansi", "Manajemen"];
+
 const MahasiswaSchema = z.object({
     nim: z.string().regex(/^[0-9]+$/, "NIM harus berupa string angka"),
     nama: z.string().min(1, { message: "Nama tidak boleh kosong" }),
-    jurusan: z.string().min(1, { message: "Jurusan tidak boleh kosong" }),
+    jurusan: z.enum(validJurusan, {
+        errorMap: () => ({ message: "Jurusan tidak valid." }),
+    }),
 });
 
 // GET semua mahasiswa DENGAN PAGINATION & SEARCH

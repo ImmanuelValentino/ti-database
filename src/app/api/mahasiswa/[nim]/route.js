@@ -15,14 +15,17 @@ export async function OPTIONS(request) {
 }
 
 // Skema Zod untuk PUT (update), semua field opsional
+const validJurusan = ["Teknik Informatika", "Sistem Informasi", "Ilmu Administrasi Bisnis", "Ilmu Komunikasi", "Akuntansi", "Manajemen"];
+
 const UpdateMahasiswaSchema = z.object({
     nama: z.string().min(1, { message: "Nama tidak boleh kosong" }).optional(),
-    jurusan: z.string().min(1, { message: "Jurusan tidak boleh kosong" }).optional(),
+    jurusan: z.enum(validJurusan, {
+        errorMap: () => ({ message: "Jurusan tidak valid." }),
+    }).optional(),
 })
     .refine(data => Object.keys(data).length > 0, {
         message: "Request body tidak boleh kosong.",
     });
-
 // GET mahasiswa by NIM
 export async function GET(req, { params }) {
     const { nim } = params;
